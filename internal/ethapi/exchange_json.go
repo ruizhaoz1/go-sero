@@ -165,7 +165,13 @@ func (b *PKAddress) UnmarshalText(input []byte) error {
 			if len(dec) != 64 {
 				return errors.New("PKAddress must be length 64 ")
 			}
-			copy(b[:], dec)
+			pk := keys.Uint512{}
+			copy(pk[:], dec[:])
+			if keys.IsPKValid(&pk) {
+				copy(b[:], pk[:])
+			} else {
+				return errors.New("invalid PK")
+			}
 		}
 		return err
 	}
@@ -196,7 +202,7 @@ func (b *TKAddress) UnmarshalText(input []byte) error {
 		if len(out) == 64 {
 			copy(b[:], out[:])
 		} else {
-			return errors.New("ivalid PK")
+			return errors.New("ivalid TK")
 		}
 		return nil
 	} else {
@@ -209,7 +215,7 @@ func (b *TKAddress) UnmarshalText(input []byte) error {
 			err = mapError(err)
 		} else {
 			if len(dec) != 64 {
-				return errors.New("PKAddress must be length 64 ")
+				return errors.New("TKAddress must be length 64 ")
 			}
 			copy(b[:], dec)
 		}
@@ -261,7 +267,13 @@ func (b *PKrAddress) UnmarshalText(input []byte) error {
 			if len(dec) != 96 {
 				return errors.New("PKrAddress must be length 96")
 			}
-			copy(b[:], dec)
+			pkr := keys.PKr{}
+			copy(pkr[:], dec[:])
+			if keys.PKrValid(&pkr) {
+				copy(b[:], pkr[:])
+			} else {
+				return errors.New("invalid PKr")
+			}
 		}
 		return err
 	}

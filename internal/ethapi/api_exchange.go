@@ -128,7 +128,12 @@ func (s *PublicExchangeAPI) GenTxWithSign(ctx context.Context, param GenTxArgs) 
 	if err := param.check(); err != nil {
 		return nil, err
 	}
-	_, tx, e := exchange.CurrentExchange().GenTxWithSign(param.toTxParam())
+	txParam, tx, e := exchange.CurrentExchange().GenTxWithSign(param.toTxParam())
+	if tx != nil {
+		for _, in := range txParam.Ins {
+			tx.Roots = append(tx.Roots, in.Out.Root)
+		}
+	}
 	return tx, e
 }
 
@@ -478,6 +483,7 @@ func (s *PublicExchangeAPI) GetBlockByNumber(ctx context.Context, blockNum *int6
 	fields := map[string]interface{}{
 		"BlockNumber": block.Header().Number.Uint64(),
 		"BlockHash":   block.Hash(),
+		"ParentHash":  block.ParentHash(),
 		"Timestamp":   block.Header().Time.Uint64(),
 		"TxHashes":    transactions,
 	}

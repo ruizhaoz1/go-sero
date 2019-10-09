@@ -100,9 +100,8 @@ type Backend interface {
 	GetRecordsByTxHash(txHash keys.Uint256) (records []exchange.Utxo, err error)
 
 	//Light node api
-	GetOutByPKr(pkrs []keys.PKr, start,end uint64) (br light.BlockOutResp, e error)
+	GetOutByPKr(pkrs []keys.PKr, start, end uint64) (br light.BlockOutResp, e error)
 	CheckNil(Nils []keys.Uint256) (nilResps []light.NilValue, e error)
-
 }
 
 func GetAPIs(apiBackend Backend) []rpc.API {
@@ -115,6 +114,12 @@ func GetAPIs(apiBackend Backend) []rpc.API {
 			Public:    true,
 		},
 		{
+			Namespace: "sero",
+			Version:   "1.0",
+			Service:   &PublicAbiAPI{},
+			Public:    true,
+		},
+		{
 			Namespace: "light",
 			Version:   "1.0",
 			Service:   &PublicLightNodeApi{apiBackend},
@@ -124,6 +129,18 @@ func GetAPIs(apiBackend Backend) []rpc.API {
 			Namespace: "ssi",
 			Version:   "1.0",
 			Service:   &PublicSSIAPI{apiBackend},
+			Public:    true,
+		},
+		{
+			Namespace: "local",
+			Version:   "1.0",
+			Service:   &PublicLocalAPI{},
+			Public:    true,
+		},
+		{
+			Namespace: "flight",
+			Version:   "1.0",
+			Service:   &PublicFlightAPI{&PublicExchangeAPI{apiBackend}},
 			Public:    true,
 		},
 		{
